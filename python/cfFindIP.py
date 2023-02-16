@@ -50,11 +50,11 @@ def fncDomainCheck(subnets):
             try:
                 r = s.get(realUrl, headers={"Host": "fronting.sudoer.net"})
                 if r.status_code == 200:
-                    print(f"{bcolors.OKGREEN} OK {bcolors.OKBLUE} {realIP}")
+                    print(f"{bcolors.OKGREEN} OK {bcolors.OKBLUE} {realIP} {bcolors.ENDC}")
                 else:
-                    print(f"{bcolors.FAIL} NO {bcolors.WARNNING} {realIP}")
+                    print(f"{bcolors.FAIL} NO {bcolors.WARNNING} {realIP} {bcolors.ENDC}")
             except:
-                print(f"{bcolors.FAIL} NO {bcolors.FAIL} {realIP}")
+                print(f"{bcolors.FAIL} NO {bcolors.FAIL} {realIP} {bcolors.ENDC}")
 
 def split(listInput, chunk_size):
   for i in range(0, len(listInput), chunk_size):
