@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import sys
 import ipaddress
 import http.client
@@ -5,7 +6,6 @@ import requests
 import urllib3
 import multiprocessing
 from requests.adapters import HTTPAdapter
-
 
 class bcolors:
     HEADER = '\033[95m'
@@ -39,10 +39,9 @@ class FrontingAdapter(HTTPAdapter):
             server_hostname = self.fronted_domain
         super(FrontingAdapter, self).init_poolmanager(server_hostname=server_hostname, *args, **kwargs)
 
-def fncDomainCheck(subnet):
-    breakedSubnets = list(ipaddress.ip_network(subnet.strip()).subnets(new_prefix=24))
-    for breakedSubnet in breakedSubnets:
-        ipList = list(ipaddress.ip_network(breakedSubnet).subnets(new_prefix=32))
+def fncDomainCheck(subnets):
+    for subnet in subnets:
+        ipList = list(ipaddress.ip_network(subnet).subnets(new_prefix=32))
         for ip in ipList:
             realIP=str(ip).replace('/32', '')
             realUrl=f"https://{realIP}/"
@@ -67,12 +66,13 @@ if __name__ == "__main__":
     subnetFile = open(str(filePath), 'r')
     subnetList = subnetFile.readlines()
     jobs = []
-    chunkedList = list(split(subnetList, int(threadsCount)))
-    for chunkedSubnet in chunkedList:
-        for subnet in chunkedSubnet:
-            process = multiprocessing.Process(target=fncDomainCheck, args=(subnet,))
-            jobs.append(process)
-            process.start()
-        for job in jobs:
-            job.join()
-
+    for subnet in subnetList:
+        breakedSubnets = list(ipaddress.ip_network(subnet.strip()).subnets(new_prefix=24))
+        chunkedList = list(split(breakedSubnets, int(threadsCount)))
+        for chunkedSubnet in chunkedList:
+            for subnet in chunkedSubnet:
+                process = multiprocessing.Process(target=fncDomainCheck, args=(subnet,))
+                jobs.append(process)
+                process.start()
+            for job in jobs:
+                job.join()
