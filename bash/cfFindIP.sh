@@ -78,7 +78,7 @@ function fncShowProgress {
 # Function fncCheckSubnet
 # Check Subnet
 function fncCheckSubnet {
-	local ipList scriptDir resultFile timeoutCommand domainFronting
+	local ipList scriptDir resultFile timeoutCommand domainFronting binDir
 	ipList="${1}"
 	resultFile="${3}"
 	scriptDir="${4}"
@@ -93,6 +93,7 @@ function fncCheckSubnet {
 	osVersion="${13}"
 	v2rayCommand="${14}"
 	configDir="$scriptDir/../config"
+	binDir="$scriptDir/../bin"
 	# set proper command for linux
 	if command -v timeout >/dev/null 2>&1; 
 	then
@@ -146,7 +147,7 @@ function fncCheckSubnet {
 					then
 						kill -9 "$pid" > /dev/null 2>&1
 					fi
-					nohup "$scriptDir"/"$v2rayCommand" -c "$ipConfigFile" > /dev/null &
+					nohup "$binDir"/"$v2rayCommand" -c "$ipConfigFile" > /dev/null &
 					sleep 2
 					timeMil=$($timeoutCommand 2 curl -x "socks5://127.0.0.1:3$port" -s -w "TIME: %{time_total}\n" https://"$scanDomain"/"$downloadFile" --output /dev/null | grep "TIME" | tail -n 1 | awk '{print $2}' | xargs -I {} echo "{} * 1000 /1" | bc )
 					# shellcheck disable=SC2009
